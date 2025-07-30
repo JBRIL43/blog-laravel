@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 const ViewPosts = () => {
+
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -140,6 +142,7 @@ const ViewPosts = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-gray-900 px-4 py-12">
             <div className="max-w-7xl mx-auto">
+                
                 {/* Modern Search & Filter Bar */}
                 <div className="flex flex-col md:flex-row items-center gap-4 mb-8">
                     <div className="flex-1 flex items-center bg-white/5 rounded-lg px-4 py-2">

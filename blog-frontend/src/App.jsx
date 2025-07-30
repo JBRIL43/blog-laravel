@@ -8,10 +8,13 @@ import PostDetails from "./pages/PostDetails";
 import NewPost from "./pages/NewPost";
 import ViewPosts from "./pages/ViewPosts";
 import EditPost from "./pages/EditPost";
+import Header from "./components/Header";
 
 const App = () => {
     return (
+        
         <BrowserRouter>
+            <Header></Header>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />

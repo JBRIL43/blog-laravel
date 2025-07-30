@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,10 +12,13 @@ const PostDetails = () => {
     const { comments, loading, error } = useSelector((state) => state.comments);
     const dispatch = useDispatch();
     const { token, user } = useSelector((state) => state.auth);
+    const incrementedRef = useRef(false);
 
     // Increment view count on mount and fetch post/comments
     useEffect(() => {
         const fetchPostAndComments = async () => {
+            if (incrementedRef.current) return; // Prevent double increment
+            incrementedRef.current = true;
             dispatch(setLoading(true));
             try {
                 // Increment views (publicly)
