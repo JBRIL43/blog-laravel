@@ -33,7 +33,8 @@ const PostDetails = () => {
                 const res = await api.get(`/posts/${id}`);
                 setPost(res.data);
                 dispatch(setComments(res.data.comments || []));
-            } catch {
+            } catch (error) {
+                console.log(error);
                 dispatch(setError("Failed to load post details"));
             } finally {
                 dispatch(setLoading(false));

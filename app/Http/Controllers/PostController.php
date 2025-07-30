@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\PostService;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -24,7 +25,7 @@ class PostController extends Controller
     // Query (Read)
     public function show($id)
     {
-        return $this->postService->getPost($id);
+        return Post::with(['comments.user'])->findOrFail($id);
     }
 
     // Command (Write)
@@ -58,5 +59,19 @@ class PostController extends Controller
     {
         $this->postService->deletePost($id);
         return response()->json(['message' => 'Post deleted']);
+    }
+
+    // Command: Increment views
+    public function incrementViews($id)
+    {
+        $post = $this->postService->incrementViews($id);
+        return response()->json($post);
+    }
+
+    // Command: Increment likes
+    public function incrementLikes($id)
+    {
+        $post = $this->postService->incrementLikes($id);
+        return response()->json($post);
     }
 }

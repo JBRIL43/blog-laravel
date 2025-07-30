@@ -37,4 +37,14 @@ class PostService
     {
         return $this->posts->delete($id);
     }
+
+    public function incrementViews($id)
+    {
+        return $this->posts->incrementViews($id);
+    }
+
+    public function incrementLikes($id)
+    {
+        return $this->posts->incrementLikes($id);
+    }
 }

@@ -35,4 +35,17 @@ class PostRepository implements PostRepositoryInterface
         $post->delete();
         return true;
     }
+    public function incrementViews($id)
+    {
+        $post = Post::findOrFail($id);
+        $post->increment('views');
+        return $post;
+    }
+
+    public function incrementLikes($id)
+    {
+        $post = Post::findOrFail($id);
+        $post->increment('likes');
+        return $post;
+    }
 }
