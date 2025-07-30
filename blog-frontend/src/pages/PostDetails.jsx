@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { useSelector, useDispatch } from "react-redux";
 import { setComments, setLoading, setError } from "../features/commentsSlice";
@@ -13,28 +13,23 @@ const PostDetails = () => {
     const dispatch = useDispatch();
     const { token, user } = useSelector((state) => state.auth);
 
-    // Increment view count on mount
+    // Increment view count on mount and fetch post/comments
     useEffect(() => {
         const fetchPostAndComments = async () => {
             dispatch(setLoading(true));
             try {
-                // Increment views
+                // Increment views (publicly)
                 await api.post(
                     `/posts/${id}/increment-views`,
                     {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${
-                                token || localStorage.getItem("token")
-                            }`,
-                        },
-                    }
+                    token
+                        ? { headers: { Authorization: `Bearer ${token}` } }
+                        : undefined
                 );
                 const res = await api.get(`/posts/${id}`);
                 setPost(res.data);
                 dispatch(setComments(res.data.comments || []));
             } catch (error) {
-                console.log(error);
                 dispatch(setError("Failed to load post details"));
             } finally {
                 dispatch(setLoading(false));
@@ -49,20 +44,13 @@ const PostDetails = () => {
             await api.post(
                 `/posts/${id}/increment-likes`,
                 {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${
-                            token || localStorage.getItem("token")
-                        }`,
-                    },
-                }
+                token
+                    ? { headers: { Authorization: `Bearer ${token}` } }
+                    : undefined
             );
-            // Refresh post data
             const res = await api.get(`/posts/${id}`);
             setPost(res.data);
-        } catch {
-            // Optionally show error
-        }
+        } catch {}
     };
 
     // Add comment handler
@@ -82,13 +70,11 @@ const PostDetails = () => {
                     },
                 }
             );
-            // Refresh comments
             const res = await api.get(`/posts/${id}`);
             setPost(res.data);
             dispatch(setComments(res.data.comments || []));
             setCommentInput("");
         } catch {
-            // Optionally show error
         } finally {
             setCommentLoading(false);
         }
@@ -99,84 +85,56 @@ const PostDetails = () => {
     if (!post) return null;
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-900 to-gray-900 px-4 py-10 relative overflow-hidden">
-            {/* Animated background blobs */}
-            <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none">
-                <div
-                    className="absolute w-80 h-80 bg-indigo-500 opacity-20 rounded-full blur-3xl animate-blob1"
-                    style={{ top: "-4rem", left: "-4rem" }}
-                />
-                <div
-                    className="absolute w-80 h-80 bg-blue-400 opacity-20 rounded-full blur-3xl animate-blob2"
-                    style={{ top: "8rem", right: "-4rem" }}
-                />
-                <div
-                    className="absolute w-80 h-80 bg-pink-400 opacity-20 rounded-full blur-3xl animate-blob3"
-                    style={{ bottom: "-4rem", left: "25%" }}
-                />
-            </div>
-            <div className="w-full max-w-2xl bg-white/10 rounded-3xl shadow-2xl p-8 md:p-12 border-2 border-indigo-400/20 animate-fadeInUp">
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-400/40 to-blue-200/20 flex items-center justify-center text-2xl text-indigo-400 font-bold shadow-lg">
-                        {post.user?.name?.[0] || post.author?.[0] || "?"}
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-semibold text-white text-lg">
-                            {post.user?.name || post.author || "Unknown Author"}
-                        </span>
-                        <span className="text-xs text-gray-300">
-                            {post.createdAt
-                                ? new Date(post.createdAt).toLocaleDateString(
-                                      undefined,
-                                      {
-                                          year: "numeric",
-                                          month: "short",
-                                          day: "numeric",
-                                      }
-                                  )
-                                : post.created_at
-                                ? new Date(post.created_at).toLocaleDateString(
-                                      undefined,
-                                      {
-                                          year: "numeric",
-                                          month: "short",
-                                          day: "numeric",
-                                      }
-                                  )
-                                : ""}
-                        </span>
-                    </div>
-                    <span className="ml-auto bg-indigo-100 text-indigo-800 text-xs font-semibold px-3 py-1 rounded-full">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-gray-900 px-2 py-8 flex justify-center">
+            <div className="w-full max-w-2xl mx-auto">
+                {/* Breadcrumb */}
+                <div className="mb-4">
+                    <Link
+                        to="/posts"
+                        className="text-indigo-300 hover:underline text-xs font-semibold"
+                    >
+                        ← Back to Articles
+                    </Link>
+                </div>
+                {/* Title & Meta */}
+                <div className="mb-2 flex items-center gap-2">
+                    <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-3 py-1 rounded-full">
                         {post.category || "General"}
                     </span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-4 drop-shadow-lg">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
                     {post.title}
                 </h1>
-                <div className="flex items-center gap-6 mb-6">
-                    <span className="flex items-center gap-1 text-indigo-200">
+                <p className="text-gray-300 mb-2">{post.excerpt}</p>
+                <div className="flex items-center gap-4 mb-4 text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
+                            className="w-4 h-4"
+                            fill="currentColor"
                             viewBox="0 0 24 24"
-                            stroke="currentColor"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                            />
+                            <circle cx="12" cy="12" r="10" />
                         </svg>
-                        {post.views || 0} views
+                        {post.user?.name || post.author || "Unknown"}
                     </span>
+                    <span>
+                        {post.createdAt
+                            ? new Date(post.createdAt).toLocaleDateString()
+                            : post.created_at
+                            ? new Date(post.created_at).toLocaleDateString()
+                            : ""}
+                    </span>
+                    <span>{post.readTime || "5 min read"}</span>
+                    <span>{post.views || 0} views</span>
+                    <span>{post.likes || 0} likes</span>
+                </div>
+                {/* Like & Share */}
+                <div className="flex items-center gap-3 mb-4">
                     <button
                         onClick={handleLike}
                         className="flex items-center gap-1 text-pink-400 hover:text-pink-600 font-semibold focus:outline-none"
                     >
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"
                             fill="none"
                             viewBox="0 0 24 24"
@@ -192,10 +150,68 @@ const PostDetails = () => {
                         {post.likes || 0} Like
                         {(post.likes || 0) !== 1 ? "s" : ""}
                     </button>
+                    {/* Add share button if needed */}
                 </div>
+                {/* Cover Image */}
+                <div className="mb-8 flex justify-center">
+                    {post.coverImage ? (
+                        <img
+                            src={post.coverImage}
+                            alt="cover"
+                            className="rounded-xl w-full max-w-md object-cover bg-white/10"
+                            style={{ minHeight: 180, maxHeight: 240 }}
+                        />
+                    ) : (
+                        <div className="w-full max-w-md h-40 bg-white/10 rounded-xl flex items-center justify-center">
+                            <svg
+                                className="w-16 h-16 text-indigo-200 opacity-50"
+                                fill="none"
+                                viewBox="0 0 48 48"
+                            >
+                                <rect
+                                    width="48"
+                                    height="48"
+                                    rx="24"
+                                    fill="currentColor"
+                                />
+                                <path
+                                    d="M16 32l8-8 8 8"
+                                    stroke="#fff"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <circle
+                                    cx="24"
+                                    cy="20"
+                                    r="4"
+                                    stroke="#fff"
+                                    strokeWidth="2"
+                                />
+                            </svg>
+                        </div>
+                    )}
+                </div>
+                {/* Article Content */}
                 <div className="prose prose-invert max-w-none text-lg text-gray-100 mb-8">
+                    {/* If using markdown, render here */}
                     {post.body}
                 </div>
+                {/* About Author */}
+                <div className="bg-white/10 rounded-xl p-4 mb-8 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-400/40 to-blue-200/20 flex items-center justify-center text-indigo-400 font-bold shadow text-lg">
+                        {post.user?.name?.[0] || post.author?.[0] || "?"}
+                    </div>
+                    <div>
+                        <div className="font-semibold text-white">
+                            {post.user?.name || post.author || "Unknown"}
+                        </div>
+                        <div className="text-xs text-gray-300">
+                            {post.user?.bio || "No bio provided."}
+                        </div>
+                    </div>
+                </div>
+                {/* Comments */}
                 <div className="mt-8">
                     <h2 className="text-xl font-semibold text-white mb-4">
                         Comments ({comments.length})
@@ -240,56 +256,40 @@ const PostDetails = () => {
                                 No comments yet. Be the first to comment!
                             </li>
                         )}
-                        {comments.map((comment) => (
-                            <li
-                                key={comment.id}
-                                className="bg-white/10 border border-indigo-400/10 rounded-xl px-4 py-3 text-gray-200 flex items-start gap-3"
-                            >
-                                <span className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-400/40 to-blue-200/20 flex items-center justify-center text-indigo-400 font-bold shadow text-sm mt-1">
-                                    {comment.user?.name?.[0] || "?"}
-                                </span>
-                                <div>
-                                    <div className="font-semibold text-white text-sm">
-                                        {comment.user?.name || "Anonymous"}
-                                        <span className="ml-2 text-xs text-gray-400">
-                                            {comment.created_at
-                                                ? new Date(
-                                                      comment.created_at
-                                                  ).toLocaleDateString()
-                                                : ""}
-                                        </span>
+                        {[...comments]
+                            .sort(
+                                (a, b) =>
+                                    new Date(a.created_at) -
+                                    new Date(b.created_at)
+                            ) // chronological order (oldest first)
+                            .map((comment) => (
+                                <li
+                                    key={comment.id}
+                                    className="bg-white/10 border border-indigo-400/10 rounded-xl px-4 py-3 text-gray-200 flex items-start gap-3"
+                                >
+                                    <span className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-400/40 to-blue-200/20 flex items-center justify-center text-indigo-400 font-bold shadow text-sm mt-1">
+                                        {comment.user?.name?.[0] || "?"}
+                                    </span>
+                                    <div>
+                                        <div className="font-semibold text-white text-sm">
+                                            {comment.user?.name || "Anonymous"}
+                                            <span className="ml-2 text-xs text-gray-400">
+                                                {comment.created_at
+                                                    ? new Date(
+                                                          comment.created_at
+                                                      ).toLocaleDateString()
+                                                    : ""}
+                                            </span>
+                                        </div>
+                                        <div className="text-gray-200">
+                                            {comment.body}
+                                        </div>
                                     </div>
-                                    <div className="text-gray-200">
-                                        {comment.body}
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
+                                </li>
+                            ))}
                     </ul>
                 </div>
             </div>
-            <style>{`
-                @keyframes fadeInUp {
-                    0% { opacity: 0; transform: translateY(40px); }
-                    100% { opacity: 1; transform: translateY(0); }
-                }
-                .animate-fadeInUp { animation: fadeInUp 1s cubic-bezier(.4,0,.2,1) both; }
-                @keyframes blob1 {
-                    0%, 100% { transform: scale(1) translate(0, 0); }
-                    50% { transform: scale(1.1) translate(30px, 20px); }
-                }
-                @keyframes blob2 {
-                    0%, 100% { transform: scale(1) translate(0, 0); }
-                    50% { transform: scale(1.1) translate(-20px, 30px); }
-                }
-                @keyframes blob3 {
-                    0%, 100% { transform: scale(1) translate(0, 0); }
-                    50% { transform: scale(1.1) translate(20px, -20px); }
-                }
-                .animate-blob1 { animation: blob1 12s infinite ease-in-out; }
-                .animate-blob2 { animation: blob2 14s infinite ease-in-out; }
-                .animate-blob3 { animation: blob3 16s infinite ease-in-out; }
-            `}</style>
         </div>
     );
 };
