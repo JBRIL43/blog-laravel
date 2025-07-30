@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import PostDetails from "./pages/PostDetails";
 import NewPost from "./pages/NewPost";
 import ViewPosts from "./pages/ViewPosts";
+import EditPost from "./pages/EditPost";
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
                 <Route path="/posts" element={<ViewPosts />} />
                 <Route path="/posts/:id" element={<PostDetails />} />
                 <Route path="/new" element={<NewPost />} />
+                <Route path="/edit/:id" element={<EditPost />} />
             </Routes>
         </BrowserRouter>
     );
