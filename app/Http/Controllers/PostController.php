@@ -34,12 +34,14 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
+            'category' => 'nullable|string|max:255',
         ]);
 
         return $this->postService->createPost([
             'title' => $request->title,
             'body' => $request->body,
             'user_id' => Auth::id(),
+            'category' => $request->category,
         ]);
     }
 
