@@ -1,66 +1,199 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Blog API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful backend for a blog platform built with Laravel.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- User registration and login (JWT authentication via HTTP-only cookies)
+- CRUD operations for blog posts
+- Comments and likes on posts
+- Secure API endpoints
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP >= 8.1
+- Composer
+- Node.js & npm
+- MySQL or SQLite
+- Git (optional)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+1. **Clone the repository:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    ```bash
+    git clone <your-repo-url>
+    cd blog-api
+    ```
 
-### Premium Partners
+2. **Install PHP dependencies:**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+    ```bash
+    composer install
+    ```
 
-## Contributing
+3. **Install JavaScript dependencies:**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```bash
+    npm install
+    ```
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Database Setup
 
-## Security Vulnerabilities
+### MySQL
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. **Create a database:**
+
+    ```bash
+    mysql -u root -p
+    CREATE DATABASE blog_api;
+    ```
+
+2. **Configure `.env`:**
+
+    ```
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=blog_api
+    DB_USERNAME=your_mysql_user
+    DB_PASSWORD=your_mysql_password
+    ```
+
+### SQLite
+
+1. **Create SQLite file:**
+
+    ```bash
+    touch database/database.sqlite
+    ```
+
+2. **Configure `.env`:**
+
+    ```
+    DB_CONNECTION=sqlite
+    DB_DATABASE=/absolute/path/to/your/project/database/database.sqlite
+    ```
+
+    > Replace `/absolute/path/to/your/project/` with your actual project path.
+
+---
+
+## Environment Configuration
+
+1. **Copy `.env.example` to `.env`:**
+
+    ```bash
+    cp .env.example .env
+    ```
+
+2. **Generate application key:**
+
+    ```bash
+    php artisan key:generate
+    ```
+
+---
+
+## Running Migrations
+
+**Migrations** create the necessary tables in your database.
+
+1. **Make sure your `.env` database settings are correct.**
+2. **Run the migration command:**
+
+    ```bash
+    php artisan migrate
+    ```
+
+    - This will create all tables needed for users, posts, comments, likes, etc.
+    - If you see errors, check your database credentials and connection in `.env`.
+
+3. **(Optional) Seed the database with test data:**
+
+    ```bash
+    php artisan db:seed
+    ```
+
+---
+
+## Running the Application
+
+1. **Build frontend assets:**
+
+    ```bash
+    npm run dev
+    ```
+
+2. **Start the Laravel server:**
+
+    ```bash
+    php artisan serve
+    ```
+
+    The API will be available at `http://localhost:8000`.
+
+---
+
+## API Usage
+
+- **Register:** `POST /api/register`
+- **Login:** `POST /api/login`
+- **Get Posts:** `GET /api/posts`
+- **Create Post:** `POST /api/posts` (authenticated)
+- **Like/Comment:** (authenticated)
+
+> **Authentication:**  
+> JWT tokens are stored in HTTP-only cookies.  
+> Frontend requests must use `withCredentials: true` (Axios) or `credentials: 'include'` (fetch).
+
+---
+
+## Testing
+
+Run all tests:
+
+```bash
+php artisan test
+```
+
+---
+
+## Troubleshooting
+
+- **Database errors:**  
+  - Check your `.env` settings.
+  - Make sure the database exists and credentials are correct.
+  - For SQLite, ensure the file exists and the path is correct.
+
+- **CORS/auth issues:**  
+  - See `config/cors.php` and ensure `supports_credentials` is `true`.
+  - Make sure your frontend origin matches `allowed_origins`.
+
+- **JWT cookie not set:**  
+  - Ensure your login endpoint sets the token in an HTTP-only cookie.
+
+---
+
+## Project Structure
+
+- `app/Http/Controllers` — API logic
+- `app/Models` — Data models
+- `routes/api.php` — API routes
+- `database/migrations` — Database structure
+- `resources/` — Frontend assets (CSS/JS)
+- `tests/` — Automated tests
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT
