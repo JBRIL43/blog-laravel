@@ -28,8 +28,8 @@ A RESTful backend for a blog platform built with Laravel.
 1. **Clone the repository:**
 
     ```bash
-    git clone <your-repo-url>
-    cd blog-api
+    git clone url
+    cd blog-laravel
     ```
 
 2. **Install PHP dependencies:**
